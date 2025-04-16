@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getLabels, deleteLabel } from "../services/labelService";
 import { toast } from "react-toastify";
+import moment from "moment";
 
 const Label = () => {
   const [labels, setLabels] = useState([]);
@@ -13,7 +14,7 @@ const Label = () => {
         const data = await getLabels();
         setLabels(data);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         toast.error("Failed to fetch label data.");
       } finally {
         setLoading(false);
@@ -24,16 +25,25 @@ const Label = () => {
 
   const handleDelete = async (id) => {
     try {
-      await deleteLabel(id); 
-      setLabels((prev) => prev.filter((label) => label.ID !== id)); 
+      await deleteLabel(id);
+      setLabels((prev) => prev.filter((label) => label.ID !== id));
       toast.success(`Label with ID ${id} deleted successfully.`);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error(`Failed to delete label with ID ${id}.`);
     }
   };
 
-  if (loading) return <p className="text-center text-gray-500">Loading labels...</p>;
+  const formatValue = (value) => {
+    // If value is a valid ISO date string
+    if (typeof value === "string" && moment(value, moment.ISO_8601, true).isValid()) {
+      return moment(value).format("DD/MM/YYYY hh:mm a");
+    }
+    return value;
+  };
+
+  if (loading)
+    return <p className="text-center text-gray-500">Loading labels...</p>;
 
   return (
     <div>
@@ -43,11 +53,16 @@ const Label = () => {
           <thead>
             <tr className="bg-gray-100">
               {Object.keys(labels[0] || {}).map((key) => (
-                <th key={key} className="px-4 py-2 border-b border-gray-300 text-left">
+                <th
+                  key={key}
+                  className="px-4 py-2 border-b border-gray-300 text-left"
+                >
                   {key}
                 </th>
               ))}
-              <th className="px-4 py-2 border-b border-gray-300 text-left">Actions</th>
+              <th className="px-4 py-2 border-b border-gray-300 text-left">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -55,18 +70,18 @@ const Label = () => {
               <tr key={label.ID} className="hover:bg-gray-50">
                 {Object.values(label).map((value, index) => (
                   <td key={index} className="px-4 py-2 border-b border-gray-300">
-                    {value}
+                    {formatValue(value)}
                   </td>
                 ))}
                 <td className="px-4 py-2 border-b border-gray-300">
                   <Link
-                    to={`/update-label/${label.ID}`} 
+                    to={`/update-label/${label.ID}`}
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
                   >
                     Edit
                   </Link>
                   <button
-                    onClick={() => handleDelete(label.ID)} 
+                    onClick={() => handleDelete(label.ID)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
                     Delete

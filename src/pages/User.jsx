@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getUser, deleteUser } from "../services/userService";
 import { toast } from "react-toastify";
+import moment from "moment";
 
 const User = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +13,6 @@ const User = () => {
     const fetchUsers = async () => {
       try {
         const data = await getUser();
-        console.log(data); 
         setUsers(data);
       } catch (err) {
         console.error(err);
@@ -33,6 +33,21 @@ const User = () => {
       console.error(error);
       toast.error(`Failed to delete user with ID ${userId}.`);
     }
+  };
+
+  const formatValue = (key, value) => {
+    if (key === "isActive") {
+      return value ? "Active" : "Inactive";
+    }
+
+    if (
+      typeof value === "string" &&
+      moment(value, moment.ISO_8601, true).isValid()
+    ) {
+      return moment(value).format("D/M/YYYY h:mm a");
+    }
+
+    return value ?? "N/A";
   };
 
   if (loading) return <p className="text-center text-gray-500">Loading users...</p>;
@@ -56,14 +71,14 @@ const User = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.Id} className="hover:bg-gray-50">
-                {Object.keys(user).map((key, index) => (
-                  <td key={index} className="px-4 py-2 border-b border-gray-300">
-                    {key === 'isActive' ? (user[key] ? 'Active' : 'Inactive') : user[key] || 'N/A'}
+                {Object.entries(user).map(([key, value]) => (
+                  <td key={key} className="px-4 py-2 border-b border-gray-300">
+                    {formatValue(key, value)}
                   </td>
                 ))}
                 <td className="px-4 py-2 border-b border-gray-300">
                   <Link
-                    to={`/update-user/${user.Id}`} 
+                    to={`/update-user/${user.Id}`}
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"
                   >
                     Edit
