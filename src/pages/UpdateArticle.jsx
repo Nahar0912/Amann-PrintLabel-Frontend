@@ -33,7 +33,7 @@ const UpdateArticle = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     // eslint-disable-next-line no-unused-vars
-    const { Id, Article_No, ...updatedData } = formData;
+    const { Id, Article_No, Created, Modified, ...updatedData } = formData;
     try {
       await updateArticle(id, updatedData);
       toast.success("Article updated successfully!");
@@ -58,7 +58,9 @@ const UpdateArticle = () => {
           {Object.keys(formData).map(
             (key) =>
               key !== "Id" &&
-              key !== "Article_No" && (
+              key !== "Article_No" &&
+              key !== "Created" &&
+              key !== "Modified" && (
                 <div key={key} className="flex flex-col">
                   <label className="block font-medium text-gray-700 mb-1 text-base">
                     {key.replace(/_/g, " ")}

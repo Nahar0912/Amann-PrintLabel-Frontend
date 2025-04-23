@@ -20,7 +20,7 @@ const Home = () => {
     e.preventDefault();
     const { barcode, quantity } = formData;
 
-    const barcodePattern = /^\d{1,8}-\d{1,8}-\d{1,8}-\d{1,8}$/;
+    const barcodePattern = /^([A-Za-z0-9]{1,8})(-([A-Za-z0-9]{1,8})){1,3}$/;
     setError('');
     setSuccess('');
     
@@ -30,6 +30,10 @@ const Home = () => {
     }
     if (!barcodePattern.test(barcode)) {
       setError('Invalid barcode format. It should be XXXX-XXXX-XXXX-XXXX (8-8-8-8 digits).');
+      return;
+    }
+    if (barcode.length > 32) {
+      setError('Barcode cannot exceed 32 characters.');
       return;
     }
     if (isNaN(quantity) || Number(quantity) <= 0) {
