@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { getUser, deleteUser } from "../services/userService";
 import { toast } from "react-toastify";
 import moment from "moment";
+import $ from "jquery";
+import "datatables.net-dt/js/dataTables.dataTables";
+import "datatables.net-dt/css/dataTables.dataTables.css";
 
 const User = () => {
   const [users, setUsers] = useState([]);
@@ -24,6 +27,15 @@ const User = () => {
     fetchUsers();
   }, []);
 
+  // Initialize DataTable after data is loaded and updated
+  useEffect(() => {
+    if (!loading && users.length > 0) {
+      setTimeout(() => {
+        $('#userTable').DataTable();
+      }, 0);
+    }
+  }, [loading, users]);
+
   const handleDelete = async (userId) => {
     try {
       await deleteUser(userId);
@@ -39,14 +51,9 @@ const User = () => {
     if (key === "isActive") {
       return value ? "Active" : "Inactive";
     }
-
-    if (
-      typeof value === "string" &&
-      moment(value, moment.ISO_8601, true).isValid()
-    ) {
+    if (typeof value === "string" && moment(value, moment.ISO_8601, true).isValid()) {
       return moment(value).format("D/M/YYYY h:mm a");
     }
-
     return value ?? "N/A";
   };
 
@@ -57,7 +64,10 @@ const User = () => {
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-6 text-center">User Information</h1>
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 bg-white shadow-md rounded-lg">
+        <table
+          id="userTable"
+          className="display min-w-full border border-gray-300 bg-white shadow-md rounded-lg"
+        >
           <thead>
             <tr className="bg-gray-100">
               {Object.keys(users[0] || {}).map((key) => (

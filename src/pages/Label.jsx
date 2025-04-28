@@ -26,11 +26,14 @@ const Label = () => {
     fetchLabels();
   }, []);
 
-  // Initialize DataTable after data is loaded and updated
   useEffect(() => {
     if (!loading && labels.length > 0) {
       setTimeout(() => {
-        $('#labelTable').DataTable();
+        $('#labelTable').DataTable({
+          responsive: true,
+          autoWidth: false,
+          destroy: true, 
+        });
       }, 0);
     }
   }, [loading, labels]);
@@ -47,39 +50,52 @@ const Label = () => {
   };
 
   const formatValue = (value) => {
-    if (typeof value === "string" && moment(value, moment.ISO_8601, true).isValid()) {
+    if (
+      typeof value === "string" && value.includes("T") && moment(value, moment.ISO_8601, true).isValid()
+    ) {
       return moment(value).format("DD/MM/YYYY hh:mm a");
     }
     return value;
   };
-
+  
   if (loading)
     return <p className="text-center text-gray-500">Loading labels...</p>;
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Label Information</h1>
-      <div className="overflow-x-auto">
-        <table id="labelTable" className="display min-w-full border border-gray-300 bg-white shadow-md rounded-lg">
+      <div className="overflow-x-auto w-full">
+        <table
+          id="labelTable"
+          className="display table-auto border border-gray-300 bg-white shadow-md rounded-lg w-full"
+        >
           <thead>
             <tr className="bg-gray-100">
               {Object.keys(labels[0] || {}).map((key) => (
-                <th key={key} className="px-4 py-2 border-b border-gray-300 text-left">
+                <th
+                  key={key}
+                  className="border-b border-gray-300 text-left max-w-[150px] break-words"
+                >
                   {key}
                 </th>
               ))}
-              <th className="px-4 py-2 border-b border-gray-300 text-left">Actions</th>
+              <th className="border-b border-gray-300 text-left">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {labels.map((label) => (
               <tr key={label.ID} className="hover:bg-gray-50">
                 {Object.values(label).map((value, index) => (
-                  <td key={index} className="px-4 py-2 border-b border-gray-300">
+                  <td
+                    key={index}
+                    className="border-b border-gray-300 max-w-[100px] break-words"
+                  >
                     {formatValue(value)}
                   </td>
                 ))}
-                <td className="px-4 py-2 border-b border-gray-300">
+                <td className="border-b border-gray-300">
                   <Link
                     to={`/update-label/${label.ID}`}
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 mr-2"

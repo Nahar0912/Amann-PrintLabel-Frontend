@@ -34,6 +34,7 @@ const Article = () => {
     }
     return () => {
       if ($.fn.DataTable.isDataTable(tableRef.current)) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         $(tableRef.current).DataTable().destroy();
       }
     };
