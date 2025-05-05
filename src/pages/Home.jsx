@@ -48,9 +48,14 @@ const Home = () => {
       setFormData({ barcode: '', quantity: '' });
       console.log('Label added:', newLabel);
     } catch (err) {
-      setError('Failed to add label. Please try again.');
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Failed to add label. Please try again.');
+      }
       console.error(err);
-    } finally {
+    }
+     finally {
       setIsSubmitting(false);
     }
   };
